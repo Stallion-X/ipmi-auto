@@ -132,6 +132,44 @@ class IPMIFanController:
             return []
     
     def get_fan_speed_for_temp(self, temp: float) -> Optional[int]:
+        if self.config.use_fan_curve and self.config.fan_curve_points:
+            return self._calculate_fan_speed_from_curve(temp)
+        else:
+            return self._get_fan_speed_from_thresholds(temp)
+    
+    def _calculate_fan_speed_from_curve(self, temp: float) -> int:
+        curve_points = sorted(self.config.fan_curve_points, key=lambda x: x['temp'])
+        
+        if temp <= curve_points[0]['temp']:
+            speed = curve_points[0]['fan_speed']
+            self.logger.debug(f"温度 {temp}°C 低于曲线起点 使用最低转速 {speed}%")
+            return speed
+        
+        if temp >= curve_points[-1]['temp']:
+            speed = curve_points[-1]['fan_speed']
+            self.logger.debug(f"温度 {temp}°C 高于曲线终点 使用最高转速 {speed}%")
+            return speed
+        
+        for i in range(len(curve_points) - 1):
+            point1 = curve_points[i]
+            point2 = curve_points[i + 1]
+            
+            if point1['temp'] <= temp <= point2['temp']:
+                temp_range = point2['temp'] - point1['temp']
+                speed_range = point2['fan_speed'] - point1['fan_speed']
+                temp_offset = temp - point1['temp']
+                
+                interpolated_speed = point1['fan_speed'] + (speed_range * temp_offset / temp_range)
+                final_speed = round(interpolated_speed)
+                
+                self.logger.debug(f"温度 {temp}°C 在 {point1['temp']}-{point2['temp']}°C 区间 "
+                                f"插值计算转速: {final_speed}% (从 {point1['fan_speed']}% 到 {point2['fan_speed']}%)")
+                return final_speed
+        
+        self.logger.warning(f"风扇曲线计算异常 温度 {temp}°C 使用默认值")
+        return 20
+    
+    def _get_fan_speed_from_thresholds(self, temp: float) -> int:
         for threshold in self.config.temperature_thresholds:
             if threshold['min_temp'] <= temp <= threshold['max_temp']:
                 return threshold['fan_speed']
@@ -154,7 +192,8 @@ class IPMIFanController:
             target_speed = self.get_fan_speed_for_temp(max_temp)
             if target_speed is not None:
                 if self.set_speed(target_speed):
-                    self.logger.info(f"根据最高温度 {max_temp}°C 设置风扇转速为 {target_speed}%")
+                    curve_mode = "风扇曲线" if self.config.use_fan_curve else "阶梯模式"
+                    self.logger.info(f"根据最高温度 {max_temp}°C 设置风扇转速为 {target_speed}% ({curve_mode})")
                 else:
                     self.logger.error("设置风扇转速失败")
             

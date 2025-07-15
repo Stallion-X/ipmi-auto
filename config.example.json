@@ -5,6 +5,39 @@
     "password": "your_password_here"
   },
   "temperature_policy": {
+    "use_fan_curve": true,
+    "fan_curve_points": [
+      {
+        "temp": 30,
+        "fan_speed": 5,
+        "description": "待机温度"
+      },
+      {
+        "temp": 45,
+        "fan_speed": 10,
+        "description": "低负载"
+      },
+      {
+        "temp": 55,
+        "fan_speed": 20,
+        "description": "中等负载"
+      },
+      {
+        "temp": 65,
+        "fan_speed": 35,
+        "description": "高负载"
+      },
+      {
+        "temp": 75,
+        "fan_speed": 50,
+        "description": "高温警告"
+      },
+      {
+        "temp": 85,
+        "fan_speed": 80,
+        "description": "紧急散热"
+      }
+    ],
     "thresholds": [
       {
         "min_temp": 79,

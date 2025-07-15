@@ -58,6 +58,14 @@ class Config:
         return self.config['temperature_policy']['thresholds']
     
     @property
+    def use_fan_curve(self) -> bool:
+        return self.config['temperature_policy'].get('use_fan_curve', False)
+    
+    @property
+    def fan_curve_points(self) -> List[Dict[str, Any]]:
+        return self.config['temperature_policy'].get('fan_curve_points', [])
+    
+    @property
     def max_retries(self) -> int:
         return self.config['monitoring'].get('max_retries', 3)
     

@@ -99,7 +99,35 @@ python main.py -c /path/to/your/config.json
 - `password`: IPMI 密码
 
 ### 温度策略配置
-温度阈值按优先级排序，程序会使用第一个匹配的策略：
+
+**🎯 风扇曲线模式 (推荐)**
+启用 `use_fan_curve: true` 可以实现平滑的无级调节，就像游戏本那样：
+
+```json
+{
+  "use_fan_curve": true,
+  "fan_curve_points": [
+    {
+      "temp": 30,
+      "fan_speed": 5,
+      "description": "待机温度"
+    },
+    {
+      "temp": 65,
+      "fan_speed": 35,
+      "description": "高负载"
+    }
+  ]
+}
+```
+
+程序会在温度点之间进行线性插值，实现平滑的转速调节。例如：
+- 30°C → 5% 转速
+- 47.5°C → 20% 转速 (自动插值)
+- 65°C → 35% 转速
+
+**📊 阶梯模式 (传统)**
+设置 `use_fan_curve: false` 使用传统的温度区间模式：
 
 ```json
 {
