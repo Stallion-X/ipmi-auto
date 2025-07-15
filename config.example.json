@@ -1,0 +1,80 @@
+{
+  "server": {
+    "ip": "192.168.1.100",
+    "username": "admin",
+    "password": "your_password_here"
+  },
+  "temperature_policy": {
+    "use_fan_curve": true,
+    "fan_curve_points": [
+      {
+        "temp": 30,
+        "fan_speed": 5,
+        "description": "待机温度"
+      },
+      {
+        "temp": 45,
+        "fan_speed": 10,
+        "description": "低负载"
+      },
+      {
+        "temp": 55,
+        "fan_speed": 20,
+        "description": "中等负载"
+      },
+      {
+        "temp": 65,
+        "fan_speed": 35,
+        "description": "高负载"
+      },
+      {
+        "temp": 75,
+        "fan_speed": 50,
+        "description": "高温警告"
+      },
+      {
+        "temp": 85,
+        "fan_speed": 80,
+        "description": "紧急散热"
+      }
+    ],
+    "thresholds": [
+      {
+        "min_temp": 79,
+        "max_temp": 999,
+        "fan_speed": 40,
+        "description": "高温模式"
+      },
+      {
+        "min_temp": 70,
+        "max_temp": 78,
+        "fan_speed": 30,
+        "description": "中高温模式"
+      },
+      {
+        "min_temp": 60,
+        "max_temp": 69,
+        "fan_speed": 20,
+        "description": "中温模式"
+      },
+      {
+        "min_temp": 50,
+        "max_temp": 59,
+        "fan_speed": 15,
+        "description": "低中温模式"
+      },
+      {
+        "min_temp": 0,
+        "max_temp": 49,
+        "fan_speed": 5,
+        "description": "低温模式"
+      }
+    ]
+  },
+  "monitoring": {
+    "interval_seconds": 30,
+    "max_retries": 3,
+    "retry_delay": 5,
+    "log_level": "INFO"
+  }
+}
